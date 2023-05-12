@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+<!-- for mysql -->
+	<bean id="dataSource"
+	class="org.apache.commons.dbcp2.BasicDataSource"
+	destroy-method="close"
+	>
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/kyw_spring_mvc?serverTimezone=UTC&amp;useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+		<property name="username" value="kyw_spring_mvc_user"/>
+		<property name="password" value="1234"/>
+	</bean>	
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations" value="classpath:/sqlmap/**/*_SQL.xml"/>
+	</bean>	
+	
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory"/>
+	</bean>
+</beans>
+<!-- 
+- 위 코드는 데이터베이스에 접속하기위한 정보를 설정하는 것
+	-> 외부 연동 관련 정보는 context에서 설정한다.
+	
+- mybatis에서는 SqlSession을 생성하기 위해 SqlSessionFactory를 사용한다.
+
+- session을 한번 생성하면 mapping구문을 실행하거나 커밋 또는 롤백을 하기 위해 세션을 사용할 수 있다.
+
+- 더이상 필요하지 않은 상태가 되면 세션을 닫는다.
+	-> close()메소드를 사용해서
+	
+- mybatis-spring 연동모듈을 사용하면 SqlSessionFactory를 직접 사용할 필요가 없다.
+	-> 스프링트랜젝션 설정에 따라 자동 커밋 혹은 롤백을 수행하고 닫혀지는 쓰레드에 안전한 SqlSession객체가
+	   springBean에 주입될 수 있기 때문 
+
+- SqlSessionTemplate는 mybatis-spring 연동모듈의 핵심이다.
+
+- SqlSessionTemplate는 SqlSession을 구현하고 코드에서 SqlSession을 대체하는 역할을 수행한다.
+ -->

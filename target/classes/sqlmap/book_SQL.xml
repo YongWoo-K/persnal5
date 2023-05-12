@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 실행할 쿼리를 이곳(매퍼 xml)에 옮긴다. -->
+<mapper namespace="book">
+	<!-- 글쓰기 쿼리
+	parameter가 여러개일 경우 Type을 hashMap으로 설정한다.
+	useGeneratedKeys="true" -> 자동생성된 키값을 가져올거라는 것을 명시
+	 -->
+	<insert id="insert" parameterType="hashMap" useGeneratedKeys="true" keyProperty="book_id">
+		<![CDATA[
+		insert into book
+		(title, category, price)
+		values
+		(#{title}, #{category}, #{price})
+		]]>
+	</insert>
+	
+	<!-- 상세페이지 쿼리 -->
+	<select id="select_detail" parameterType="hashMap" resultType="hashMap">
+		<![CDATA[
+		select 
+		title, category, price, insert_date 
+		from book 
+		where 
+		book_id = #{bookId}
+		]]>
+	</select>
+	
+	<!-- 수정을 위한 기능을 만든다 -->
+	<!-- 수정화면에서 저장버튼을 클릭할 경우 기존 정보를 갱신하는 기능 -->
+	<!-- UPDATE 테이블명 SET 컬럼들 WHERE 조건 -->
+	<!-- update, select등의 태그들은 전부 다 마이바티스태그들이다. -->
+	<update id="update" parameterType="hashMap">  
+		<![CDATA[  
+		update book set  
+		title = #{title},  
+		category = #{category},  
+		price = #{price}  
+		where  
+		book_id = #{bookId}  
+		]]>  
+	</update>
+	
+	<!-- 삭제를 위한 쿼리문 -->
+	<!-- DELETE FROM 테이블명 WHERE 조건  -->
+	<delete id="delete" parameterType="hashMap">  
+		<![CDATA[  
+		delete from book  
+		where  
+		book_id = #{bookId}  
+		]]>  
+	</delete>  
+	
+	<!-- 책 목록 쿼리문 -->
+	<!-- resultType은 한 행을 담는 타입을 지정 -->
+	<!-- desc는 큰 순서부터 정렬, asc는 작은 순서부터 정렬(생략가능) -->
+	<select id="select_list" parameterType="hashMap" resultType="hashMap">  
+		<![CDATA[  
+		select  
+		book_id,  
+		title,  
+		category,  
+		price,  
+		insert_date  
+		from  
+		book  
+		where 1 = 1  
+		]]>  
+		<if test="keyword != null and keyword != ''">  
+		and (title like CONCAT('%',#{keyword},'%') or category like CONCAT('%',#{keyword},'%'))  
+		</if>  
+		order by insert_date desc
+	</select>
+	
+</mapper>
